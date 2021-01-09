@@ -1,11 +1,5 @@
 from math import *
 
-# 2 -  =C2-0,05*C2*SIN(A2)-0,05*SIN(A3)*(1-0,1*SIN(A2))*C2 - poniżej błąd, nie mam wartości dla sin(a3) czyli dla x ni poprzedniego tylko x równego krokiem funkcji
-
-# =C3-0,05*C3*SIN(A3) a3 - krok+krok, e3-poprzednia funkcja
-#         sin(X),0.1,3
-
-
 class RR:
     """ Klasa przeznaczona do obliczenia równania różniczkowego metodą Eulera i Rungego-Kutty.
         Parametry
