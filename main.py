@@ -1,45 +1,66 @@
-from RR_class import *
-from math import *
+from numericalODE import RR, Blad
+import math
 import matplotlib.pyplot as plt
 
-#zmienne
-zakres = 25
-krok =0.1
-funkcja = 'sin(3.0-x**2)'
+# Funkcje
+def fun_sin(x,y):
+    y = math.sin(x)
+    return y
 
-#iksy na wykresie
-h = 0.0
-list_h = []
-while h <= zakres+0.1:
-    list_h.append(h)
-    h += krok
+def fun_x(x,y):
+    y = x**2
+    return y
 
+def fun_exp(x,y):
+    y = math.exp(-0.2*x) * math.sin(2*x )
+    return y
 
-#Euler
-D1 = RR(funkcja,zakres,krok)
-wynikE = D1.licz_euler()
+def exact(dt, t_stop,y, x=0.0 ):
+    Y_exact = []
+    for i in range(int(t_stop / dt) + 1):
+        y = math.pow(x,3)/3
+        Y_exact.append(y)
+        x = x + dt
+    # exact sin:    1-math.cos(x)
+    # exact x:      math.pow(x,3)/3
+    # exact exp:    0.049505*math.exp(0.2*x)*math.sin(2*x) - 0.49505*math.exp(0.2*x)*cos(2*x) + 0.49505
+    return Y_exact
 
-#Runge Kutta
-wynikRK = D1.licz_rk()
+# Warunki początkowe
+t = 0.0
+t_stop = 20.0
+dt =0.01
+y = 0.0
+func = fun_x
+
+#Analitycznie
+Y_exact = exact(dt = dt, t_stop = t_stop, y = y)
+
+#obiekty
+rownanie1 = RR(func, t=t, y=y, t_stop=t_stop, dt=dt)
+Y_e, T = rownanie1.licz_euler()
+Y_rk, T = rownanie1.licz_rk4()
 
 #Błąd
-blad = Blad(wynikRK,wynikE)
-wynik_blad = blad.licz()
+blad1 = Blad(Y_rk,Y_e)
+blad1_list = blad1.licz()
+
+# ------------------------------------
 
 #wizualizacja
-plt.figure(figsize=(14,8), dpi= 80)
-plt.title(f'Dla funkcji : {funkcja}')
-#plt.xlabel("time")
-#plt.ylabel("y")
-plt.plot(list_h,wynikE, color="green",label='Euler')
-plt.plot(list_h,wynikRK, color="red",label='Runge-Kutta')
-plt.plot(list_h,wynik_blad, color="blue",label='Blad')
-plt.legend(loc='upper right', shadow=1, fontsize='x-large')
-plt.grid(True)
-plt.show()
+plt.figure(figsize=(16,5), dpi= 90)
+plt.title(f'Dla funkcji : {func.__name__}')
+plt.xlabel("time")
+plt.ylabel("y")
 
-# blad1 = Blad(wynikRK,wynikE)
-# blad1_list = blad1.licz()
-# plt.figure(figsize=(14,8),dpi= 80)
-# plt.plot(list_h,wynik_blad)
+plt.plot(T,Y_e, color="green",label='Euler')
+plt.plot(T,Y_rk, color="red",label='Runge-Kutta')
+# plt.plot(T,Y_exact, color="blue",label='Exact')
+
+plt.legend(loc='upper right', fontsize='x-large')
+plt.grid(True)
+
+plt.show()
+#
+# plt.plot(T, blad1_list)
 # plt.show()
