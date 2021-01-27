@@ -27,7 +27,7 @@ class RR:
         self.dt = dt
         self.y = y
         self.n = int(t_stop / self.dt)
-        self.t = t
+        self.t0 = t
 
     def licz_euler(self):
         """
@@ -38,21 +38,40 @@ class RR:
             T
                 lista z punktami czasowe
         """
-        self.y = 0.0
-        x = 0.0
+        y = self.y
+        x = self.t0
         T = []
         wyniki = []
 
         T.append(x)
-        wyniki.append(self.y)
+        wyniki.append(y)
 
         for i in range(0, self.n, 1):
-            self.y = self.y + self.dt * self.func(x, self.y)
-            wyniki.append(self.y)
+            y = y + self.dt * self.func(x, y)
+            wyniki.append(y)
             x = x + self.dt
             T.append(x)
 
         return wyniki, T
+
+
+    def licz_euler_light(self):
+        """
+        Returns
+        -------
+        y
+            ostatni wynik
+        """
+        y = self.y
+        x = self.t0
+        n = int(self.t_stop / self.dt)
+
+        for i in range(0, n, 1):
+            y = y + self.dt * self.func(x, y)
+            x = x + self.dt
+
+        return y
+
 
     def licz_rk4(self):
         """
@@ -63,8 +82,9 @@ class RR:
         T
             lista z punktami czasowymi
         """
-        self.y =  0.0
-        x = 0.0
+
+        y = self.y
+        x = self.t0
         T = []
         wyniki = []
 
@@ -72,18 +92,44 @@ class RR:
         wyniki.append(self.y)
 
         for i in range(0, self.n, 1):
-            k1 = self.dt * self.func(x, self.y)
-            k2 = self.dt * self.func(x + self.dt * 0.5, 0.5 * k1 + self.y)
-            k3 = self.dt * self.func(x + self.dt * 0.5, 0.5 * k2 + self.y)
-            k4 = self.dt * self.func(x + self.dt, self.y + k3)
+            k1 = self.dt * self.func(x, y)
+            k2 = self.dt * self.func(x + self.dt * 0.5, 0.5 * k1 + y)
+            k3 = self.dt * self.func(x + self.dt * 0.5, 0.5 * k2 + y)
+            k4 = self.dt * self.func(x + self.dt, y + k3)
 
-            self.y = self.y + (k1 + 2 * k2 + 2 * k3 + k4) / 6
-            wyniki.append(self.y)
+            y = y + (k1 + 2 * k2 + 2 * k3 + k4) / 6
+            wyniki.append(y)
 
             x = x + self.dt
             T.append(x)
 
         return wyniki, T
+
+
+    def licz_rk4_light(self):
+        """
+        Returns
+        -------
+        y
+            ostatni wynik
+        """
+        y = self.y
+        x = self.t0
+        n = int(self.t_stop / self.dt)
+
+        for i in range(0, n, 1):
+            k1 = self.dt * self.func(x, y)
+            k2 = self.dt * self.func(x + self.dt * 0.5, 0.5 * k1 + y)
+            k3 = self.dt * self.func(x + self.dt * 0.5, 0.5 * k2 + y)
+            k4 = self.dt * self.func(x + self.dt, y + k3)
+
+            y = y + (k1 + 2 * k2 + 2 * k3 + k4) / 6
+            x = x + self.dt
+
+        return y
+
+
+
 
 
 class Blad:
