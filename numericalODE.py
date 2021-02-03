@@ -187,8 +187,12 @@ class Blad:
 
         Parametry
         ----------
-        lista1, lista2
-            listy z wartościami float
+        lista1:
+            typ: float
+            wartości dokładne
+        lista2:
+            typ: float
+            wartości mierzone
 
         Metody
         ----------
@@ -199,22 +203,34 @@ class Blad:
         self.lista1 = list1
         self.lista2 = list2
 
-
-    def licz(self):
+    def licz_bezwzg(self):
         """
         Returns:
         ----------
         lista_blad
             lista z wartościami float"""
 
-        list_blad = []
+        list_blad1 = []
         for x, y in zip(self.lista1, self.lista2):
             wynik = x - y
-            list_blad.append(math.fabs(wynik))
+            list_blad1.append(math.fabs(wynik))
 
-        return list_blad
+        return list_blad1
+
+    def licz_wzg(self):
+        """
+        Returns:
+        ----------
+        lista_blad
+            lista z wartościami float"""
+
+        list_blad2 = []
+        for x, y in zip(self.lista1, self.lista2):
+            dx = y - x
+            wynik = (dx / x)  # *100 ->jesli bedzie blad procentowy
+            list_blad2.append(math.fabs(wynik))
+
+        return list_blad2
 
 
-def fun_exp(x,y):
-    y = math.exp(-0.2*x) * math.sin(2*x)
-    return y
+
