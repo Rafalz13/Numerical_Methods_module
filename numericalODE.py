@@ -54,7 +54,6 @@ class RR:
 
         return wyniki, T
 
-
     def licz_euler_light(self):
         """
         Returns
@@ -72,6 +71,26 @@ class RR:
 
         return y
 
+    def licz_euler_2dim(self, f, g, u, params):
+        x = u[0]
+        y = u[1]
+
+        T = []
+        wyniki = []
+        n = int(self.t_stop / self.dt)
+        t = self.t0
+        T.append(t)
+        wyniki.append([x, y])
+
+        for i in range(0, n, 1):
+            x = x + self.dt * f(t, x, y, params)
+            y = y + self.dt * g(t, x, y, params)
+
+            wyniki.append([x, y])
+            t = t + self.dt
+            T.append(t)
+
+        return wyniki, T
 
     def licz_rk4(self):
         """
@@ -128,8 +147,37 @@ class RR:
 
         return y
 
+    def licz_rk4_2dim(self, f, g, u, params):
+        x = u[0]
+        y = u[1]
+        t = self.t0
+        n = int(self.t_stop / self.dt)
+        T = []
+        wyniki = []
 
+        wyniki.append([x, y])
+        T.append(t)
 
+        for i in range(0, n, 1):
+            k1 = f(t, x, y, params)
+            l1 = g(t, x, y, params)
+            k2 = f(t + self.dt / 2, x + self.dt * k1 / 2, y + self.dt * l1 / 2, params)
+            l2 = g(t + self.dt / 2, x + self.dt * k1 / 2, y + self.dt * l1 / 2, params)
+            k3 = f(t + self.dt / 2, x + self.dt * k2 / 2, y + self.dt * l2 / 2, params)
+            l3 = g(t + self.dt / 2, x + self.dt * k2 / 2, y + self.dt * l2 / 2, params)
+            k4 = f(t + self.dt, x + self.dt * k3, y + self.dt * l3, params)
+            l4 = g(t + self.dt, x + self.dt * k3, y + self.dt * l3, params)
+
+            k = (k1 + 2 * k2 + 2 * k3 + k4) / 6
+            l = (l1 + 2 * l2 + 2 * l3 + l4) / 6
+            x = x + self.dt * k
+            y = y + self.dt * l
+            t = t + self.dt
+
+            T.append(t)
+            wyniki.append([x, y])
+
+        return wyniki, T
 
 
 class Blad:
@@ -167,4 +215,6 @@ class Blad:
         return list_blad
 
 
-
+def fun_exp(x,y):
+    y = math.exp(-0.2*x) * math.sin(2*x)
+    return y
