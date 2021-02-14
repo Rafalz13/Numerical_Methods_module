@@ -1,27 +1,27 @@
 import math
 import matplotlib.pyplot as plt
 import time
+from abc import ABC, abstractmethod
 
+class RR(ABC):
+    """ Klasa przeznaczona do obliczenia równania różniczkowego metodą Eulera i Rungego-Kutty."""
 
-class RR:
-    """ Klasa przeznaczona do obliczenia równania różniczkowego metodą Eulera i Rungego-Kutty.
-        Parameters
-        ----------
-        func : funkcja przekazana
-        t: czas początkowy
-        t_stop : punkt końcowy czasu
-        dt : krok czasowy
-            domyślnie: dt = 0.1
-        y: wartość znana
-
-        Methods
-        -------
-        licz_euler
-            metoda służąca do obliczenia metody Eulera zwraca tablice wyników
-        licz_rk
-            metoda służąca do obliczenia metody Rungego-Kutty zwraca tablice wyników """
 
     def __init__(self, func, y, t, t_stop, dt=0.1):
+        """
+        Parameters
+        ----------
+        func: function
+            przekazana funkcja
+        y: float
+            wartość znana, y początkowe
+        t: float
+            czas początkowy
+        t_stop: float
+            punkt końcowy czasu
+        dt: float
+            krok czasowy
+        """
         self.func = func
         self.t_stop = t_stop
         self.dt = dt
@@ -29,14 +29,57 @@ class RR:
         self.n = int(t_stop / self.dt)
         self.t0 = t
 
-    def licz_euler(self):
+    @abstractmethod
+    def licz(self): pass
+
+    @abstractmethod
+    def licz_czas(self, dt, t_stop): pass
+
+    @abstractmethod
+    def licz_uklad_rownan(self, f, g, u, params): pass
+
+
+class Euler(RR):
+    """
+    Klasa służy do rozwiązywania równań różniczkowych metodami numerycznymi
+
+    Methods:
+    --------
+    licz
+        służy do rozwiązywania równań różniczkowych
+    licz_czas
+        służy do mierzenia czasu obliczeń
+    licz_uklad_rownań
+        służy do rozwiązywania  układu równań różniczkowych
+
+    """
+    def __init__(self, func, y, t, t_stop, dt):
         """
-        Returns
-            -------
-            wyniki
-                lista z wartościami float
-            T
-                lista z punktami czasowe
+        Parameters
+        ----------
+        func: function
+            przekazana funkcja
+        y: float
+            wartość znana, y początkowe
+        t: float
+            czas początkowy
+        t_stop: float
+            punkt końcowy czasu
+        dt: float
+            krok czasowy
+        """
+        super().__init__(func, y, t, t_stop, dt)
+
+    def licz(self):
+        """
+        Metoda służąca do rozwiązywania równania metoda Eulera.
+        Zwraca tablicę z wynikami oraz tablicę z punktami czasowymi.
+
+        Returns:
+        -------
+             wyniki - lista z wartościami float,
+
+             T - lista z punktami czasowymi
         """
         y = self.y
         x = self.t0
@@ -54,24 +97,60 @@ class RR:
 
         return wyniki, T
 
-    def licz_euler_light(self):
+    def licz_czas(self,dt, t_stop):
         """
+        Metoda służy do obliczenia wartości na danym punkcie t_stop, obliczenia bez operacji na listach.
+
+        Parameters
+        ----------
+        dt: float
+            krok czasowy
+        t_stop: float
+            punkt czasowy na którym zwracna jest wartość
+
         Returns
-        -------
-        y
-            ostatni wynik
+        ---------
+        ret
+            y - wartość wyniku na podanym punkcie t_stop,
+
+            czas -  czas jaki trwaly obliczenia
         """
+        start2 = time.time()
         y = self.y
+
+        # przypisanie na początku żeby y nie brało z innej funkcji tylko to oryginalne początkowe
         x = self.t0
-        n = int(self.t_stop / self.dt)
+        n = int(t_stop / dt)  # ilośc punktów/powtórzen
 
         for i in range(0, n, 1):
-            y = y + self.dt * self.func(x, y)
-            x = x + self.dt
+            y = y + dt * self.func(x, y)
+            x = x + dt
 
-        return y
+        end2 = time.time()
+        czas = end2 - start2
+        # print(f'[Euler] czas bez list: {czas}')
+        return y, czas
 
-    def licz_euler_2dim(self, f, g, u, params):
+    def licz_uklad_rownan(self, f, g, u, params):
+        """
+        Parameters
+        ----------
+        f: function
+            funkcja f
+        g: function
+            funkcja g
+        u: list
+            wektor przechowujący 2 wartości początkowe
+        params: dict
+            parametry do funkcji w formie słownika
+
+        Returns
+        ---------
+        ret
+            wyniki - wyniki w postaci listy przechowującej wektory,
+
+            T- lista kroków czasowych
+        """
         x = u[0]
         y = u[1]
 
@@ -92,16 +171,50 @@ class RR:
 
         return wyniki, T
 
-    def licz_rk4(self):
+
+class RK4(RR):
+    """
+    Klasa służy do rozwiązywania równań różniczkowych metodami numerycznymi
+
+    Methods:
+    --------
+    licz
+        służy do rozwiązywania równań różniczkowych
+    licz_czas
+        służy do mierzenia czasu obliczeń
+    licz_uklad_rownań
+        służy do rozwiązywania  układu równań różniczkowych
+
+    """
+    def __init__(self, func, y, t, t_stop, dt):
         """
+        Parameters
+        ----------
+        func: function
+            przekazana funkcja
+        y: float
+            wartość znana, y początkowe
+        t: float
+            czas początkowy
+        t_stop: float
+            punkt końcowy czasu
+        dt: float
+            krok czasowy
+        """
+        super().__init__(func, y, t, t_stop, dt)
+
+    def licz(self):
+        """
+        Metoda służąca do rozwiązywania równania metodą Rungego-Kutty czwartego rzędu.
+        Zwraca tablicę z wynikami oraz tablicę z punktami czasowymi.
+
         Returns
         -------
-        wyniki
-            lista z wartościami float
-        T
-            lista z punktami czasowymi
-        """
+        ret
+             wyniki - lista z wartościami float,
 
+             T - lista z punktami czasowymi
+        """
         y = self.y
         x = self.t0
         T = []
@@ -124,30 +237,66 @@ class RR:
 
         return wyniki, T
 
+    def licz_czas(self, dt, t_stop):
+        """
+        Metoda służy do obliczenia wartości na danym punkcie t_stop, obliczenia bez operacji na listach.
 
-    def licz_rk4_light(self):
-        """
+        Parameters
+        ----------
+        dt: float
+            krok czasowy
+        t_stop: float
+            punkt czasowy na którym zwracna jest wartość
+
         Returns
-        -------
-        y
-            ostatni wynik
+        ---------
+        ret
+            y - wartość wyniku na podanym punkcie t_stop,
+
+            czas -  czas jaki trwaly obliczenia
+
         """
+
+        start2rk = time.time()
+
         y = self.y
         x = self.t0
-        n = int(self.t_stop / self.dt)
+        n = int(t_stop / dt)
 
         for i in range(0, n, 1):
-            k1 = self.dt * self.func(x, y)
-            k2 = self.dt * self.func(x + self.dt * 0.5, 0.5 * k1 + y)
-            k3 = self.dt * self.func(x + self.dt * 0.5, 0.5 * k2 + y)
-            k4 = self.dt * self.func(x + self.dt, y + k3)
+            k1 = dt * self.func(x, y)
+            k2 = dt * self.func(x + dt * 0.5, 0.5 * k1 + y)
+            k3 = dt * self.func(x + dt * 0.5, 0.5 * k2 + y)
+            k4 = dt * self.func(x + dt, y + k3)
 
             y = y + (k1 + 2 * k2 + 2 * k3 + k4) / 6
-            x = x + self.dt
+            x = x + dt
 
-        return y
+        end2rk = time.time()
+        czas = end2rk - start2rk
+        # print(f'[RK4] czas bez list: {czas}')
+        return y, czas
 
-    def licz_rk4_2dim(self, f, g, u, params):
+    def licz_uklad_rownan(self, f, g, u, params):
+        """
+        Parameters
+        ----------
+        f: function
+            funcja f
+        g: function
+            funkcja g
+        u: list
+            wektor [x,y] przechowujący 2 wartości początkowe
+        params: dict
+            parametry do funkcji w formie słownika
+
+        Returns
+        ---------
+        ret
+            wyniki - wyniki w postaci listy przechowującej wektory,
+
+            T- lista kroków czasowych
+        """
         x = u[0]
         y = u[1]
         t = self.t0
@@ -181,56 +330,64 @@ class RR:
 
 
 class Blad:
-    """ Klasa służąca do obliczenia różnicy miedzy wynikami uzystanych różnymi metodam.
-        Przyjmuje 2 listy, które są porównywane. Wynikiem jest lista z wartościami różnic.
-        Listy muszą mieć taki sam rozmiar.
 
-        Parametry
+    """
+    Klasa służąca do obliczenia różnicy miedzy wynikami uzystanych różnymi metodam.
+    Przyjmuje 2 listy, które są porównywane. Wynikiem jest lista z wartościami różnic.
+    Listy muszą mieć taki sam rozmiar.
+
+    Functions
+    ----------
+    licz_bezwzg
+        metoda wyliczająca błąd bezwzględny
+    licz_bezwzg
+        metoda wyliczająca błąd względny
+    """
+
+    def __init__(self, lista1, lista2):
+        """
+        Parameters
         ----------
-        lista1:
-            typ: float
-            wartości dokładne
-        lista2:
-            typ: float
-            wartości mierzone
-
-        Metody
-        ----------
-        licz
-            metoda wyliczająca różnicę między wartościami w listach """
-
-    def __init__(self, list1, list2):
-        self.lista1 = list1
-        self.lista2 = list2
+        lista1: list
+            wartości dokładne typu float
+        lista2: list
+            wartości mierzone typu float
+        """
+        self.lista1 = lista1
+        self.lista2 = lista2
 
     def licz_bezwzg(self):
         """
-        Returns:
-        ----------
-        lista_blad
+        Metoda służy do liczenia błędu bezwzględnego
+
+        Return:
+        ---------
+        lista_blad: list
             lista z wartościami float"""
 
-        list_blad1 = []
+        list_blad = []
         for x, y in zip(self.lista1, self.lista2):
             wynik = x - y
-            list_blad1.append(math.fabs(wynik))
+            list_blad.append(math.fabs(wynik))
 
-        return list_blad1
+        return list_blad
 
     def licz_wzg(self):
         """
-        Returns:
+        Metoda służy do liczenia błędu bezwzględnego
+
+        Return:
         ----------
-        lista_blad
+        lista_blad: list
             lista z wartościami float"""
 
-        list_blad2 = []
+        list_blad = []
         for x, y in zip(self.lista1, self.lista2):
             dx = y - x
             wynik = (dx / x)  # *100 ->jesli bedzie blad procentowy
-            list_blad2.append(math.fabs(wynik))
+            list_blad.append(math.fabs(wynik))
 
-        return list_blad2
+        return list_blad
 
 
 
