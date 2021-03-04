@@ -1,66 +1,68 @@
-from numericalODE import RR, Blad
-from functions import *
+import math
 import matplotlib.pyplot as plt
+import time
+from abc import ABC, abstractmethod
+from scipy import integrate
+import numpy as np
 
-# Warunki początkowe
+from numericalODE import RK4, Euler, Blad
+from functions import fun_exp, lot_volt_f, lot_volt_g, to_1dim, exact
+
+
+#warunki początkowe
 t = 0.0
-t_stop = 50.0
+t_stop = 80.0
+
 dt = 0.1
-dt_e = 0.05
+dt_e = 0.1
+
 y = 1.0
-y0 = [20,2]
+y0 = [30,4]
 func = fun_exp
+
 params = {
-    'a': 0.6,   # współczynnik nardzin ofiar
-    'b': 0.2,   # czestotliwosc umierania ofiar
-    'c': 0.1,   # przyrost drapieżników
-    'd': 0.4    # umieranie drapieżnikow
+    'a': 0.2,   # współczynnik nardzin ofiar
+    'b': 0.04,   # czestotliwosc umierania ofiar
+    'c': 0.04,   # przyrost drapieżników
+    'd': 0.5    # umieranie drapieżnikow
     }
+# tuple - do Scipy
+params_ =[v for _, v in params.items()]
+params_= tuple(params_)
 
-#Analitycznie
-Y_exact_e = exact(dt_e, t_stop, y)
-Y_exact_rk = exact(dt, t_stop, y)
+# obliczenia
+euler_1 = Euler(fun_exp, y, t, t_stop, dt)
+rk4_1 = RK4(fun_exp, y, t, t_stop, dt)
 
-#obiekty
-rownanie1 = RR(func, t=t, y=y, t_stop=t_stop, dt=dt)
-rownanie2 = RR(func, t=t, y=y, t_stop=t_stop, dt=dt_e)
-#Euler
-Y_e, Te = rownanie2.licz_euler()
-Y_el = rownanie2.licz_euler_light()
-#Runge Kutta
-Y_rk, Trk = rownanie1.licz_rk4()
-Y_rkl = rownanie1.licz_rk4_light()
+# Lotki-Volterry, ukad równań różniczkowych
+Ye_2dim, Te_2dim = euler_1.licz_uklad_rownan(f=lot_volt_f, g=lot_volt_g, u=y0, params=params)
+Yrk_2dim, Trk_2dim = rk4_1.licz_uklad_rownan(f=lot_volt_f, g=lot_volt_g, u=y0, params=params)
+preyRK, predRK = to_1dim(Yrk_2dim)
+preyE, predE = to_1dim(Ye_2dim)
 
-#Błąd
-blad1 = Blad(Y_exact_rk,Y_rk)
-blad_bezwzgl_rk = blad1.licz_bezwzg()
-blad_wzgl_rk = blad1.licz_wzg()
-
-
-wyniki_blad(blad_wzgl_rk[1:],dt, 20) # jezeli dla Eulera-> zmienić nazwe błędu i dt dla Eulera
-# ------------------------------------
-
-plt.figure(figsize=(16,5),dpi= 80)
-# plt.plot(Trk, blad_bezwzgl,color="red", label="bezwzgledny")
-plt.plot(Trk, blad_wzgl_rk, color="green", label="wzgledny-RK4")
-plt.xlabel("time",fontsize=15)
-plt.ylabel("blad",fontsize=15)
+# wizualizacja
+plt.figure(figsize=(15,8))
+plt.plot(Te_2dim, Ye_2dim, label="E")
+plt.plot(Trk_2dim, Yrk_2dim, label="RK")
+plt.xlabel("czas")
+plt.ylabel("liczba zwierząt")
 plt.legend()
 plt.show()
 
+# równanie różniczkowe
+t_stop = 40
+euler_2 = Euler(fun_exp, y, t, t_stop, dt)
+rk4_2 = RK4(fun_exp, y, t, t_stop, dt)
+
+Ye, Te = euler_2.licz()
+Yrk, Trk = rk4_2.licz()
+exact_rk = exact(dt,t_stop,y)
+
 #wizualizacja
-plt.figure(figsize=(16,5), dpi= 90)
-plt.title(f'Dla funkcji : {func.__name__}')
-plt.xlabel("time")
-plt.ylabel("y")
-
-plt.plot(Te,Y_e, color="orange",label='Euler')
-plt.plot(Trk,Y_rk, color="red",label='Runge-Kutta')
-plt.plot(Te,Y_exact_e, color="blue",label='Exact_euler')
-plt.plot(Trk,Y_exact_rk, color="purple",label='Exact_RK')
-
-plt.legend(loc='upper right', fontsize='x-large')
-plt.grid(True)
-
+plt.figure(figsize=(16,10))
+plt.plot(Te,Ye, color="red", label=f"Euler dt: {dt_e}")
+plt.plot(Trk,exact_rk, label="exact")
+plt.xlabel("czas",fontsize=13)
+plt.ylabel("y",fontsize=13)
+plt.legend()
 plt.show()
-
