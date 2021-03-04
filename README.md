@@ -4,6 +4,7 @@ W repozytorium znajdują się pliki:
 * numericalODE - główny plik modułu
 * main - plik w którym jest przykładowe użycie modułu
 * functions - plik przechowujący funkcje używane do pracy z modułem
+* Tests - plik z przykładowymi testami 
 
 numericalODE:
 --------------
