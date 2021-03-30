@@ -1,20 +1,20 @@
-# Moduł z algorytmami rozwiązującymi równania różniczkowe
+# Module with algorithms for solving differential equations
 
-W repozytorium znajdują się pliki:
-* numericalODE - główny plik modułu
-* main - plik w którym jest przykładowe użycie modułu
-* functions - plik przechowujący funkcje używane do pracy z modułem
-* Tests - plik z przykładowymi testami 
+Files in repository:
+* numericalODE - main module file
+* main - the file contains an example module usage
+* functions - the file contains functions needed to work with the module
+* Tests - the file contains tests and analysis using the module
 
 numericalODE:
 --------------
-Składa się z klasy głównej RR i klas pchodnych Euler oraz RK4. Euler implementuje algorytm do rozwiązywania równań różniczkowych metodą Eulera. RK4 implementuje algorytm Rungego-Kutty czwartego rzędu rozwiązywania równań różniczkowych. Dodatkowo w module znajduj się klasa Blad.
+It consists of the main class RR and the derived classes Euler and RK4. Euler implements an algorithm for solving differential equations using the Euler method. RK4 implements Runge-Kutta's fourth order algorithm for solving differential equations. Additionally, there is an Blad class in the module.
 
-Klasy składają sie z trzech metod:
-* licz - służy do rozwiązywania równań różniczkowych, zwraca listę z wynikami oraz listę z punktami czasowymi
-* licz_czas - służy do rozwiązywaia równań różniczkowych, zwraca ostatni wynik i czas potrzebny na obliczenia. Wyniki nie są zapisywane, więc liczony jest tylko czas potrzebny na obliczenia wyniku w danym punkcie.
-* licz_uklad_rownan - słuzy do rozwiązywania układu równań różniczkowych. Zwaraca listę z wektorami oraz listę z punkami czasowymi.
+The classes consist of three methods:
+* licz - is used to solve differential equations, returns a list of results and a list of time points.
+* licz_czas - is used to solve differential equations, returns the last result and the time needed for the calculation. The results are not saved, so only the time needed to calculate the result at a given point is counted.
+* licz_uklad_rownan - is used to solve a system of differential equations. Returns a list with vectors and a list with time points.
 
 Blad:
-* licz_bezwzg - służy do obliczania błędu bezwzględnego
-* licz_wzg - służy do obliczania błędu względngo
+* licz_bezwzg - it is used to calculate the absolute error
+* licz_wzg - it is used to calculate the relative error
