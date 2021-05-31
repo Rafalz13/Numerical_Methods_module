@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from scipy import integrate
 import numpy as np
 
-from numericalODE import RK4, Euler, Blad
+from numericalODE import RK4, Euler, CalcError
 from functions import fun_exp, lot_volt_f, lot_volt_g, to_1dim, exact
 
 
@@ -35,8 +35,8 @@ euler_1 = Euler(fun_exp, y, t, t_stop, dt)
 rk4_1 = RK4(fun_exp, y, t, t_stop, dt)
 
 # Lotki-Volterry, ukad równań różniczkowych
-Ye_2dim, Te_2dim = euler_1.licz_uklad_rownan(f=lot_volt_f, g=lot_volt_g, u=y0, params=params)
-Yrk_2dim, Trk_2dim = rk4_1.licz_uklad_rownan(f=lot_volt_f, g=lot_volt_g, u=y0, params=params)
+Ye_2dim, Te_2dim = euler_1.solve_system(f=lot_volt_f, g=lot_volt_g, u=y0, params=params)
+Yrk_2dim, Trk_2dim = rk4_1.solve_system(f=lot_volt_f, g=lot_volt_g, u=y0, params=params)
 preyRK, predRK = to_1dim(Yrk_2dim)
 preyE, predE = to_1dim(Ye_2dim)
 
@@ -54,8 +54,8 @@ t_stop = 40
 euler_2 = Euler(fun_exp, y, t, t_stop, dt)
 rk4_2 = RK4(fun_exp, y, t, t_stop, dt)
 
-Ye, Te = euler_2.licz()
-Yrk, Trk = rk4_2.licz()
+Ye, Te = euler_2.solve()
+Yrk, Trk = rk4_2.solve()
 exact_rk = exact(dt,t_stop,y)
 
 #wizualizacja
