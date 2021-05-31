@@ -30,13 +30,13 @@ class RR(ABC):
         self.t0 = t
 
     @abstractmethod
-    def licz(self): pass
+    def solve(self): pass
 
     @abstractmethod
-    def licz_czas(self, dt, t_stop): pass
+    def solve_time(self, dt, t_stop): pass
 
     @abstractmethod
-    def licz_uklad_rownan(self, f, g, u, params): pass
+    def solve_system(self, f, g, u, params): pass
 
 
 class Euler(RR):
@@ -45,9 +45,9 @@ class Euler(RR):
 
     Methods:
     --------
-    licz
+    solve
         służy do rozwiązywania równań różniczkowych
-    licz_czas
+    solve_time
         służy do mierzenia czasu obliczeń
     licz_uklad_rownań
         służy do rozwiązywania  układu równań różniczkowych
@@ -70,7 +70,7 @@ class Euler(RR):
         """
         super().__init__(func, y, t, t_stop, dt)
 
-    def licz(self):
+    def solve(self):
         """
         Metoda służąca do rozwiązywania równania metoda Eulera.
         Zwraca tablicę z wynikami oraz tablicę z punktami czasowymi.
@@ -97,7 +97,7 @@ class Euler(RR):
 
         return wyniki, T
 
-    def licz_czas(self,dt, t_stop):
+    def solve_time(self,dt, t_stop):
         """
         Metoda służy do obliczenia wartości na danym punkcie t_stop, obliczenia bez operacji na listach.
 
@@ -131,7 +131,7 @@ class Euler(RR):
         # print(f'[Euler] czas bez list: {czas}')
         return y, czas
 
-    def licz_uklad_rownan(self, f, g, u, params):
+    def solve_system(self, f, g, u, params):
         """
         Parameters
         ----------
@@ -178,9 +178,9 @@ class RK4(RR):
 
     Methods:
     --------
-    licz
+    solve
         służy do rozwiązywania równań różniczkowych
-    licz_czas
+    solve_time
         służy do mierzenia czasu obliczeń
     licz_uklad_rownań
         służy do rozwiązywania  układu równań różniczkowych
@@ -203,7 +203,7 @@ class RK4(RR):
         """
         super().__init__(func, y, t, t_stop, dt)
 
-    def licz(self):
+    def solve(self):
         """
         Metoda służąca do rozwiązywania równania metodą Rungego-Kutty czwartego rzędu.
         Zwraca tablicę z wynikami oraz tablicę z punktami czasowymi.
@@ -237,7 +237,7 @@ class RK4(RR):
 
         return wyniki, T
 
-    def licz_czas(self, dt, t_stop):
+    def solve_time(self, dt, t_stop):
         """
         Metoda służy do obliczenia wartości na danym punkcie t_stop, obliczenia bez operacji na listach.
 
@@ -277,7 +277,7 @@ class RK4(RR):
         # print(f'[RK4] czas bez list: {czas}')
         return y, czas
 
-    def licz_uklad_rownan(self, f, g, u, params):
+    def solve_system(self, f, g, u, params):
         """
         Parameters
         ----------
@@ -329,7 +329,7 @@ class RK4(RR):
         return wyniki, T
 
 
-class Blad:
+class CalcError:
 
     """
     Klasa służąca do obliczenia różnicy miedzy wynikami uzystanych różnymi metodam.
@@ -338,9 +338,9 @@ class Blad:
 
     Functions
     ----------
-    licz_bezwzg
+    absolute
         metoda wyliczająca błąd bezwzględny
-    licz_bezwzg
+    relative
         metoda wyliczająca błąd względny
     """
 
@@ -356,7 +356,7 @@ class Blad:
         self.lista1 = lista1
         self.lista2 = lista2
 
-    def licz_bezwzg(self):
+    def absolute(self):
         """
         Metoda służy do liczenia błędu bezwzględnego
 
@@ -372,7 +372,7 @@ class Blad:
 
         return list_blad
 
-    def licz_wzg(self):
+    def relative(self):
         """
         Metoda służy do liczenia błędu bezwzględnego
 
